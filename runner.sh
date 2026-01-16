@@ -1,5 +1,6 @@
-SOURCE_FILE = "hello_world.cpp"
-EXECUTABLE = "hello_world"
+#!/bin/bash
+SOURCE_FILE="hello_world.cpp"
+EXECUTABLE="hello_world"
 
 g++ "$SOURCE_FILE" -o "$EXECUTABLE"
 
