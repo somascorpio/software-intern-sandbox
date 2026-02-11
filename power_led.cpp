@@ -1,36 +1,41 @@
 #include <iostream>
 #include <vector>
 #include <cstdint>
-using namespace std;
+using Buf = std::vector<uint8_t>;
 
 struct PowerLed{
     int power; //what we're serializing and deserializing
 };
 
 
-void printBuff(vector<uint8_t>& buf){
-    for(auto b:buf){
+void printBuff(Buf& buf){
+    for(const auto& b:buf){
         int temp = b;
-        cout<<temp<<",";
+        std::cout<<temp<<",";
     }
 }
 
-vector<uint8_t> pack(struct PowerLed& msg){
-    vector<uint8_t> buf(sizeof(msg));
-    memcpy(buf.data(),&msg,sizeof(msg)); //converting struct to byte vector
+Buf pack(struct PowerLed& msg){
+    Buf buf(0);
+    uint8_t byte_one;
+    byte_one = msg.power > 0 ? 1 : 0;//on or off
+    buf.push_back(byte_one);
     return buf;
+
 }
 
-struct PowerLed unpack(vector<uint8_t>& buf){
+struct PowerLed unpack(Buf& buf){
     PowerLed powerled;
-    memcpy(&powerled,buf.data(),sizeof(powerled));
-    return powerled; // converting byte vector into struct
+    int pwr;
+    pwr = buf[0] > 0 ? 1 : 0; 
+    powerled.power = pwr;
+    return powerled;
 }
 int main(){
     PowerLed message = {1}; //"on"
-    vector<uint8_t> buf = pack(message); //storing an integer in a vector of 4 bytes of data (serializing)
+    Buf buf = pack(message); //storing an integer in a vector of 4 bytes of data (serializing)
     PowerLed deserialized = unpack(buf); //deserializing the byte vector back into an integer stored in a PowerLed struct
     printBuff(buf); //prints the 4 bytes of data out
-    cout << "\nDeserialized power:" << deserialized.power << endl; //prints the deserialized integer value
+    std::cout << "\nDeserialized power:" << deserialized.power << std::endl; //prints the deserialized integer value
     return 0;
 }
