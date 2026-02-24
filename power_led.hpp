@@ -31,7 +31,7 @@ Buf pack(struct PowerLed& msg){
     for(int i = 2;i < buf.size(); i++){
         buf[i] = '0' + (int)(vltge*10);
         vltge = (vltge*10) - (int)(vltge*10);
-}
+    }
     return buf;
 
 }
@@ -39,13 +39,13 @@ Buf pack(struct PowerLed& msg){
 struct PowerLed unpack(Buf& buf){
     PowerLed powerled;
 
-    int pwr;
+    int pwr; //power deserialization
     pwr = buf[0] > 0 ? 1 : 0; 
     powerled.power = pwr;
     
-    double vltge = 0.0;
+    double vltge = 0.0; //voltage deserialization
     int divisor = 1;
-    for(int i = 1;i < buf.size();i++){
+    for(int i = 1;i < buf.size(); i++){
         vltge+=(double)(buf[i]-48)/divisor;
         divisor *= 10;
     }
