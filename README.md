@@ -84,7 +84,7 @@ Byte representation (4 bytes total):
 To build this project in **CMake**, **WSL** or some form of **Linux** must be used to ensure it builds correctly. *Do not use QuickStart in VS Code*. Use these commands in a WSL terminal to build your project:
 ```
 cmake -S . -B build
-–cmake --build build
+cmake --build build
 ```
 To run tests on the project use this command in a WSL terminal:
 ```
