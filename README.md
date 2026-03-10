@@ -13,11 +13,20 @@ The current goal of the project is to pack and unpack data to theoretically ligh
 ## Installation
 
 
-1. C++ Compiler
-2. CMake
-3. WSL
-4. Clone Repo
+Make sure you have:
 
+1. An IDE ([VS Code](https://code.visualstudio.com/download) is recommended)
+2. [Git](https://github.com/git-guides/install-git)
+3. [A C++ Compiler](https://code.visualstudio.com/docs/languages/cpp)
+4. [CMake](https://cmake.org/download/)
+5. [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) (if using Windows)
+
+Note: If using WSL, you will need to install a c++ compiler and cmake for your linux distro which can be done by running
+```
+sudo apt update
+sudo apt install cmake
+sudo apt install build-essential
+```
 
 
 
@@ -74,7 +83,7 @@ Byte representation (4 bytes total):
 
 1. cmake -S . -B build
 2. –cmake --build build
-3. ctest –test-dir build
+3. ctest --test-dir build
 
 
 ```cpp
