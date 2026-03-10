@@ -22,9 +22,20 @@ add_executable(
     tests/test_power_led.cpp
 )
 
+add_executable(
+    power_led
+    examples/power_led.cpp
+)
+
 # Include header folder
 target_include_directories(
     test_led_tests
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_include_directories(
+    power_led
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
