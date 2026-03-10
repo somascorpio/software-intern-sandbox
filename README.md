@@ -21,7 +21,7 @@ Make sure you have:
 4. [CMake](https://cmake.org/download/)
 5. [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) (if using Windows)
 
-Note: If using WSL, you will need to install a c++ compiler and cmake for your linux distro which can be done by running
+Note: If using WSL, you will need to install a C++ compiler and CMake for your Linux distro which can be done by running
 ```
 sudo apt update
 sudo apt install cmake
@@ -61,6 +61,7 @@ clang example/power_led.cpp -Iinclude -o app
 1. Right-click on the project, and select Properties. 
 2. Select Configuration Properties -> C/C++ -> General. 
 3. Set the path under Additional Include Directories: [path to \include]
+   
 
 
 #### Serialization Information (IMPORTANT)
@@ -80,13 +81,14 @@ Byte representation (4 bytes total):
 
 ## Build
 
-
-1. cmake -S . -B build
-2. –cmake --build build
-3. ctest --test-dir build
-
-
-```cpp
-//TBD
+To build this project in **CMake**, **WSL** or some form of **Linux** must be used to ensure it builds correctly. *Do not use QuickStart in VS Code*. Use these commands in a WSL terminal to build your project:
+```
+cmake -S . -B build
+–cmake --build build
+```
+To run tests on the project use this command in a WSL terminal:
+```
+ctest --test-dir build
 ```
 
+**To create your own tests, add more into tests/test_power_led.cpp**
