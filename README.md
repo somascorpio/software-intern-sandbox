@@ -145,7 +145,7 @@ Valid inputted numbers for the message can be seen in [Serialization Information
 
 Bad inputs for voltage can result in inaccurate data depending on the compiler and your version of C++. For example, with G++ version 13.3.0, the following code snippets will output bad data:
 
-###### Example 1:
+##### Example 1:
 
 ```cpp
 PowerLed message = {11.6, 30}; //11.6v (not within 0.00-9.99 range), 30 is not 0 or 1 and will output as 1 or "on"
@@ -157,7 +157,7 @@ std::cout << "\nDeserialized Voltage: " << deserialized.voltage << std::endl;
 std::cout << "\nDeserialized Power: " << deserialized.power << std::endl;
 ```
 
-##### Output:
+###### Output:
 
 ```
 01 3b 35 39
@@ -179,7 +179,7 @@ std::cout << "\nDeserialized Voltage: " << deserialized.voltage << std::endl;
 std::cout << "\nDeserialized Power: " << deserialized.power << std::endl;
 ```
 
-##### Output:
+###### Output:
 
 ```
 00 31 36 36
