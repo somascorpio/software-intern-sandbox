@@ -170,7 +170,7 @@ Deserialized Power: 1
 ##### Example 2:
 
 ```cpp
-PowerLed message = {1.666, -1}; //1.66v (trailing digits past the hundredth's place), -1 is not 0 or 1 and will output as 0 or "off"
+PowerLed message = {1.666, -1}; //1.666v (trailing digits past the hundredth's place), -1 is not 0 or 1 and will output as 0 or "off"
 Buf buffer = pack(message);
 PowerLed deserialized = unpack(buffer);
 
