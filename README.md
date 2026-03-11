@@ -65,7 +65,7 @@ Byte representation (4 bytes total):
 | integer   | 0               | 1            | The inputted integer must be either 0 (stored as 0x00) or 1 (stored as 0x01), **representing  power: "on" or "off"**. All inputs >0 will be stored as 0x01 and otherwise will be stored as 0x00 |
 | double    | 1-3             | 3            | The inputted double must be within **range of 1.60-3.50 to the hundredth's place, representing voltage**. This is stored as ASCII alphabet representations of each digit in the double (1 --> '1' --> 0x31) (ex. 1.6 in the buffer: [...,'1','6','0'], meaning we can only store 3 digit doubles inputted in the format: 0.00. Inputs >9.99 will lead to parsing errors. Trailing digits past the hundredth's place will not be considered in packing, no rounding will take place. | 
 
-*See [examples of bad inputs](examples-of-bad-inputs)*
+*See [examples of bad inputs](#examples-of-bad-inputs)*
 
 
 
