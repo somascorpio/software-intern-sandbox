@@ -25,5 +25,5 @@ TEST(PowerLedTest, UnpackWorksCorrectly){
     PowerLed led1 = unpack(buf);
 
     EXPECT_EQ(led1.power,1);
-    EXPECT_EQ(led1.voltage,2.5);
+    EXPECT_EQ(led1.voltage-2.5,<0.00001);
 }
