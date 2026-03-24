@@ -7,6 +7,7 @@ using Buf = std::vector<uint8_t>;
 struct PowerLed{
     double voltage;
     int power; //what we're serializing and deserializing
+    int rgb[3];
 };
 
 void printBuff(Buf& buf){
@@ -17,7 +18,7 @@ void printBuff(Buf& buf){
 }
 
 Buf pack(struct PowerLed& msg){
-    Buf buf(4);
+    Buf buf(7);
 
     uint8_t byte_one;
     byte_one = msg.power > 0 ? 1 : 0;//on or off
@@ -28,10 +29,15 @@ Buf pack(struct PowerLed& msg){
     buf[1] = '0' + (int)vltge; //we don't store the decimal point because we know exactly where it is in the range-- 1.6v-3.5v
 
     vltge -= tempy; //removes numbers after decimal point
-    for(int i = 2;i < buf.size(); i++){
+    for(int i = 2;i < 4; i++){
         buf[i] = '0' + (int)(vltge*10);
         vltge = (vltge*10) - (int)(vltge*10);
     }
+
+    for(int j = 4;j < 7; j++){
+        buf[j] = (uint8_t)msg.rgb[j-4];
+    }
+
     return buf;
 
 }
@@ -45,11 +51,15 @@ struct PowerLed unpack(Buf& buf){
     
     double vltge = 0.0; //voltage deserialization
     int divisor = 1;
-    for(int i = 1;i < buf.size(); i++){
+    for(int i = 1;i < 4; i++){
         vltge+=(double)(buf[i]-48)/divisor;
         divisor *= 10;
     }
     powerled.voltage = vltge;
+
+    for(int j = 4;j < 7; j++){
+        powerled.rgb[j-4] = (int)buf[j];
+    }
 
     return powerled;
 }
