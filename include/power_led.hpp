@@ -2,6 +2,7 @@
 #include <vector>
 #include <cstdint>
 #include <iomanip>
+
 using Buf = std::vector<uint8_t>;
 
 struct PowerLed{
@@ -17,12 +18,37 @@ void printBuff(Buf& buf){
     }
 }
 
+Buf packInt(int num){
+    double loops = (double)num/(double)255;
+    if((int)loops < loops || loops == 0){
+        loops=(int)loops+1;
+    }
+    else{
+        loops = (int)loops;
+    }
+
+    Buf buf((int)loops);
+    int temp = num;
+    for(int i = 0;i <(int)loops; ++i){
+        if(temp<255){
+            buf[i] = (uint8_t)temp;
+        }
+        else{
+            buf[i] = (uint8_t)255;
+            temp-=255;
+        }
+    }
+
+    return buf;
+}
+
 Buf pack(struct PowerLed& msg){
     Buf buf(7);
 
     uint8_t byte_one;
     byte_one = msg.power > 0 ? 1 : 0;//on or off
-    buf[0] = byte_one;
+    Buf thingy = packInt(byte_one);
+    buf[0] = thingy[0];
 
     double vltge = msg.voltage;
     int tempy = (int)vltge;
@@ -35,7 +61,7 @@ Buf pack(struct PowerLed& msg){
     }
 
     for(int j = 4;j < 7; j++){
-        buf[j] = (uint8_t)msg.rgb[j-4];
+        buf[j] = packInt(msg.rgb[j-4])[0];
     }
 
     return buf;

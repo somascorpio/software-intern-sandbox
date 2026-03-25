@@ -15,5 +15,6 @@ int main(){
     for(int i = 0;i < 3; i++){
         std::cout << "\t" << std::dec << (int)deserialized.rgb[i] << std::endl;
     }
+
     return 0;
 }
