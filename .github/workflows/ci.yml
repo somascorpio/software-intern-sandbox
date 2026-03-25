@@ -2,7 +2,7 @@ name: C++ CI (CMake + GoogleTest)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, feature/caleb-add-github-actions-workflow ]
   pull_request:
 
 jobs:
