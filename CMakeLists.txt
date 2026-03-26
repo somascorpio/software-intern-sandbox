@@ -49,3 +49,5 @@ target_link_libraries(
 # Auto-discover tests
 include(GoogleTest)
 gtest_discover_tests(test_led_tests)
+
+add_test(NAME test_led_tests COMMAND test_led_tests)
