@@ -17,20 +17,37 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 # Add test executable
-add_executable(runTests
+add_executable(
+    test_led_tests
     tests/test_power_led.cpp
+)
+
+add_executable(
+    power_led
     examples/power_led.cpp
 )
 
 # Include header folder
-target_include_directories(runTests PRIVATE include)
+target_include_directories(
+    test_led_tests
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_include_directories(
+    power_led
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
 # Link GoogleTest
-target_link_libraries(runTests gtest gtest_main)
-
-#Register Test
-add_test(NAME runTests COMMAND runTests)
+target_link_libraries(
+    test_led_tests
+    gtest_main
+)
 
 # Auto-discover tests
 include(GoogleTest)
-gtest_discover_tests(runTests)
+gtest_discover_tests(test_led_tests)
+
+add_test(NAME test_led_tests COMMAND test_led_tests)
