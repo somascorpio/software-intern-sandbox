@@ -33,4 +33,4 @@ add_test(NAME runTests COMMAND runTests)
 
 # Auto-discover tests
 include(GoogleTest)
-gtest_discover_tests(test_led_tests)
+gtest_discover_tests(runTests)
