@@ -42,6 +42,21 @@ Buf packInt(int num){
     return buf;
 }
 
+Buf packDouble(double num){
+    Buf buf;
+    int befPoint = (int)num;
+    while(befPoint>0){
+        buf.push_back('0'+befPoint%10);
+        befPoint/=10;
+    }
+    buf.push_back('.');
+    double aftPoint = num-(int)num;
+    while(aftPoint>0){
+        buf.push_back('0'+(int)(aftPoint*10));
+        aftPoint = (aftPoint*10) - (int)(aftPoint*10);
+    }
+}
+
 Buf pack(struct PowerLed& msg){
     Buf buf(7);
 
