@@ -19,6 +19,7 @@ void printBuff(Buf& buf){
 }
 
 Buf packInt(int num){
+    /*
     double loops = (double)num/(double)255;
     if((int)loops < loops || loops == 0){
         loops=(int)loops+1;
@@ -40,9 +41,17 @@ Buf packInt(int num){
     }
 
     return buf;
+    */
+
+    Buf buf;
+    for(;num > 0; num>>8){
+        buf.push_back(num & 0xFF);
+    }
+
+    return buf;
 }
 
-Buf packDouble(double num){
+Buf packDouble(double& num){
     Buf buf;
     int befPoint = (int)num;
     while(befPoint>0){
@@ -51,28 +60,43 @@ Buf packDouble(double num){
     }
     buf.push_back('.');
     double aftPoint = num-(int)num;
-    while(aftPoint>0){
+    while(aftPoint>0.000001){
         buf.push_back('0'+(int)(aftPoint*10));
         aftPoint = (aftPoint*10) - (int)(aftPoint*10);
     }
+    return buf;
+}
+
+double unpackDouble(Buf buf){
+    int dub1 = 0;
+    int n = 0;
+    char digit = buf[n];
+    while(digit!='.'){
+        dub1 = dub1*10 + (int)digit;
+        n++;
+        digit = buf[n];
+    }
+    int divisor = 10;
+    double dub2 = dub1;
+    for(int i = n+1;i < buf.size(); i++){
+        dub2 += (double)(buf[i]-49)/divisor;
+        divisor*=10;
+    }
+
+    return dub2;
 }
 
 Buf pack(struct PowerLed& msg){
-    Buf buf(7);
+    Buf buf(8);
 
     uint8_t byte_one;
     byte_one = msg.power > 0 ? 1 : 0;//on or off
-    Buf thingy = packInt(byte_one);
-    buf[0] = thingy[0];
+    Buf inty = packInt(byte_one);
+    buf[0] = inty[0];
 
-    double vltge = msg.voltage;
-    int tempy = (int)vltge;
-    buf[1] = '0' + (int)vltge; //we don't store the decimal point because we know exactly where it is in the range-- 1.6v-3.5v
-
-    vltge -= tempy; //removes numbers after decimal point
-    for(int i = 2;i < 4; i++){
-        buf[i] = '0' + (int)(vltge*10);
-        vltge = (vltge*10) - (int)(vltge*10);
+    Buf dubby = packDouble(msg.voltage);
+    for(int i = 1;i < 4; i++){
+        buf[i] = dubby[i-1];
     }
 
     for(int j = 4;j < 7; j++){
@@ -89,14 +113,9 @@ struct PowerLed unpack(Buf& buf){
     int pwr; //power deserialization
     pwr = buf[0] > 0 ? 1 : 0; 
     powerled.power = pwr;
-    
-    double vltge = 0.0; //voltage deserialization
-    int divisor = 1;
-    for(int i = 1;i < 4; i++){
-        vltge+=(double)(buf[i]-48)/divisor;
-        divisor *= 10;
-    }
-    powerled.voltage = vltge;
+
+    Buf vltgeBuf(buf.begin()+1,buf.begin()+4);
+    powerled.voltage = unpackDouble(vltgeBuf);
 
     for(int j = 4;j < 7; j++){
         powerled.rgb[j-4] = (int)buf[j];
