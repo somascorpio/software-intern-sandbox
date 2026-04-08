@@ -19,13 +19,9 @@ void printBuff(Buf& buf){
 }
 
 Buf packInt(int num){
-    /*
-    double loops = (double)num/(double)255;
-    if((int)loops < loops || loops == 0){
-        loops=(int)loops+1;
-    }
-    else{
-        loops = (int)loops;
+    int loops = num/255;
+    if(num%255 > 0 || num==0){
+        loops++;
     }
 
     Buf buf((int)loops);
@@ -41,26 +37,21 @@ Buf packInt(int num){
     }
 
     return buf;
-    */
-
-    Buf buf;
-    for(;num > 0; num>>8){
-        buf.push_back(num & 0xFF);
-    }
-
-    return buf;
 }
 
-Buf packDouble(double& num){
+Buf packDouble(double& num,int size){
+    int count = size;
     Buf buf;
     int befPoint = (int)num;
     while(befPoint>0){
         buf.push_back('0'+befPoint%10);
         befPoint/=10;
+        count--;
     }
     buf.push_back('.');
+    count--;
     double aftPoint = num-(int)num;
-    while(aftPoint>0.000001){
+    for(int i = 0;i < count; i++){
         buf.push_back('0'+(int)(aftPoint*10));
         aftPoint = (aftPoint*10) - (int)(aftPoint*10);
     }
@@ -68,18 +59,21 @@ Buf packDouble(double& num){
 }
 
 double unpackDouble(Buf buf){
+    Buf buffy(buf.size());
+    buffy = buf;
+    int count = 10;
     int dub1 = 0;
     int n = 0;
-    char digit = buf[n];
+    char digit = buffy[n];
     while(digit!='.'){
-        dub1 = dub1*10 + (int)digit;
+        dub1 = dub1*10 + ((int)digit-48);
         n++;
-        digit = buf[n];
+        digit = buffy[n];
     }
     int divisor = 10;
     double dub2 = dub1;
-    for(int i = n+1;i < buf.size(); i++){
-        dub2 += (double)(buf[i]-49)/divisor;
+    for(int i = n+1;i < buffy.size(); i++){
+        dub2 += (double)(buffy[i]-48)/divisor;
         divisor*=10;
     }
 
@@ -94,13 +88,13 @@ Buf pack(struct PowerLed& msg){
     Buf inty = packInt(byte_one);
     buf[0] = inty[0];
 
-    Buf dubby = packDouble(msg.voltage);
-    for(int i = 1;i < 4; i++){
+    Buf dubby = packDouble(msg.voltage, 4);
+    for(int i = 1;i < 5; i++){
         buf[i] = dubby[i-1];
     }
 
-    for(int j = 4;j < 7; j++){
-        buf[j] = packInt(msg.rgb[j-4])[0];
+    for(int j = 5;j < 8; j++){
+        buf[j] = packInt(msg.rgb[j-5])[0];
     }
 
     return buf;
@@ -114,11 +108,14 @@ struct PowerLed unpack(Buf& buf){
     pwr = buf[0] > 0 ? 1 : 0; 
     powerled.power = pwr;
 
-    Buf vltgeBuf(buf.begin()+1,buf.begin()+4);
+    Buf::const_iterator first = buf.begin()+1;
+    Buf::const_iterator last = buf.begin()+5;
+    Buf vltgeBuf(first,last);
+
     powerled.voltage = unpackDouble(vltgeBuf);
 
-    for(int j = 4;j < 7; j++){
-        powerled.rgb[j-4] = (int)buf[j];
+    for(int j = 5;j < 8; j++){
+        powerled.rgb[j-5] = (int)buf[j];
     }
 
     return powerled;
