@@ -15,8 +15,9 @@ TEST(PowerLedTest, PackSetsVoltageCorrectly)
     Buf buf = pack(led);
 
     EXPECT_EQ(buf[1], '2'); //2
-    EXPECT_EQ(buf[2],'5'); //.5
-    EXPECT_EQ(buf[3],'0');//.00
+    EXPECT_EQ(buf[2],'.');
+    EXPECT_EQ(buf[3],'5'); //.5
+    EXPECT_EQ(buf[4],'0');//.00
 }
 
 TEST(PowerLedTest, UnpackWorksCorrectly){
