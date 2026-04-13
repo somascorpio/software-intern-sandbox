@@ -39,12 +39,12 @@ Buf packInt(int num){
     return buf;
 }
 
-Buf packDouble(double& num,int size){
+Buf packDouble(double num,int size){
     int count = size;
     Buf buf;
     int befPoint = (int)num;
     while(befPoint>0){
-        buf.push_back('0'+befPoint%10);
+        buf.insert(buf.begin(),'0'+befPoint%10);
         befPoint/=10;
         count--;
     }

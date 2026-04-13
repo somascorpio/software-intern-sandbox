@@ -16,5 +16,11 @@ int main(){
         std::cout << "\t" << std::dec << (int)deserialized.rgb[i] << std::endl;
     }
 
+    Buf test = packDouble(10.99,5);
+    double num = unpackDouble(test);
+    std::cout << "\nTesting serialization with doubles/floats > 9:\n" << "\t" << 10.99 << " --> ";
+    printBuff(test);
+    std::cout << "--> " << num << std::endl;
+
     return 0;
 }
