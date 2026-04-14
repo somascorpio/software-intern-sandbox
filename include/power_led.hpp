@@ -19,21 +19,10 @@ void printBuff(Buf& buf){
 }
 
 Buf packInt(int num){
-    int loops = num/255;
-    if(num%255 > 0 || num==0){
-        loops++;
-    }
-
-    Buf buf((int)loops);
-    int temp = num;
-    for(int i = 0;i <(int)loops; ++i){
-        if(temp<255){
-            buf[i] = (uint8_t)temp;
-        }
-        else{
-            buf[i] = (uint8_t)255;
-            temp-=255;
-        }
+    Buf buf(8);
+    
+    for (int i = 0; i < 8 && num > 0; i++ && num >> 8) {
+        buf[i] = (num & 0xFF);
     }
 
     return buf;
@@ -58,6 +47,15 @@ Buf packDouble(double num,int size){
     return buf;
 }
 
+int unpackInt(Buf buf){
+    int inty = 0;
+    int multiplier = 1;
+    for(int i = 0;i < buf.size(); ++i){
+        inty += buf[i]*multiplier;
+        multiplier*=256;
+    }
+    return inty;
+}
 double unpackDouble(Buf buf){
     Buf buffy(buf.size());
     buffy = buf;
@@ -86,7 +84,7 @@ Buf pack(struct PowerLed& msg){
     uint8_t byte_one;
     byte_one = msg.power > 0 ? 1 : 0;//on or off
     Buf inty = packInt(byte_one);
-    buf[0] = inty[0];
+    buf[0] = unpackInt(inty);
 
     Buf dubby = packDouble(msg.voltage, 4);
     for(int i = 1;i < 5; i++){
@@ -94,7 +92,8 @@ Buf pack(struct PowerLed& msg){
     }
 
     for(int j = 5;j < 8; j++){
-        buf[j] = packInt(msg.rgb[j-5])[0];
+        Buf tempRGB = packInt(msg.rgb[j-5]);
+        buf[j] = unpackInt(tempRGB);
     }
 
     return buf;
