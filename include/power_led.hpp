@@ -19,10 +19,11 @@ void printBuff(Buf& buf){
 }
 
 Buf packInt(int num){
-    Buf buf(8);
-    
-    for (int i = 0; i < 8 && num > 0; i++ && num >> 8) {
-        buf[i] = (num & 0xFF);
+    Buf buf{};
+    int num1 = num;
+    for (int i = 0; i < 8 && num1 > 0;i++){
+        buf.push_back((uint8_t)(num1 & 0xFF));
+        num1 = num1 >> 8;
     }
 
     return buf;
@@ -84,7 +85,7 @@ Buf pack(struct PowerLed& msg){
     uint8_t byte_one;
     byte_one = msg.power > 0 ? 1 : 0;//on or off
     Buf inty = packInt(byte_one);
-    buf[0] = unpackInt(inty);
+    buf[0] = inty[0];
 
     Buf dubby = packDouble(msg.voltage, 4);
     for(int i = 1;i < 5; i++){
@@ -93,7 +94,9 @@ Buf pack(struct PowerLed& msg){
 
     for(int j = 5;j < 8; j++){
         Buf tempRGB = packInt(msg.rgb[j-5]);
-        buf[j] = unpackInt(tempRGB);
+        if(!tempRGB.empty()){
+            buf[j] = tempRGB[0];
+        }
     }
 
     return buf;
@@ -103,8 +106,8 @@ Buf pack(struct PowerLed& msg){
 struct PowerLed unpack(Buf& buf){
     PowerLed powerled;
 
-    int pwr; //power deserialization
-    pwr = buf[0] > 0 ? 1 : 0; 
+    Buf buffy = {buf[0]};
+    int pwr = unpackInt(buffy) > 0 ? 1 : 0; //power deserialization
     powerled.power = pwr;
 
     Buf::const_iterator first = buf.begin()+1;
@@ -114,7 +117,8 @@ struct PowerLed unpack(Buf& buf){
     powerled.voltage = unpackDouble(vltgeBuf);
 
     for(int j = 5;j < 8; j++){
-        powerled.rgb[j-5] = (int)buf[j];
+        Buf intBuf = {buf[j]};
+        powerled.rgb[j-5] = unpackInt(intBuf);
     }
 
     return powerled;
