@@ -50,10 +50,8 @@ Buf packDouble(double num,int size){
 
 int unpackInt(Buf buf){
     int inty = 0;
-    int multiplier = 1;
     for(int i = 0;i < buf.size(); ++i){
-        inty += buf[i]*multiplier;
-        multiplier*=256;
+        inty |= buf[i] << (8*i);
     }
     return inty;
 }
