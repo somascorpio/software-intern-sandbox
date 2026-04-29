@@ -26,7 +26,6 @@ Buf packInt(int num){
         num1 = num1 >> 8;
     }
     if(num == 0){buf.push_back(0);}
-    std::cout<<buf.size()<<std::endl;
     buf.insert(buf.begin(),buf.size());
     
     buf.insert(buf.begin(),'I');
@@ -60,13 +59,13 @@ int unpackInt(Buf buf){
     int size = buf[1];
     int inty = 0;
     for(int i = 2;i < 2+size; ++i){
-        inty |= buf[i] << (8*i);
+        inty |= buf[i] << (8*(i-2));
     }
 
     return inty;
 }
 double unpackDouble(Buf buf){
-    int size = buf[2];
+    int size = buf[1];
     int count = 10;
     int dub1 = 0;
     int n = 2;
@@ -107,7 +106,7 @@ Buf pack(struct PowerLed& msg){
         buf.insert(buf.end(),tempRGB.begin(),tempRGB.end());
     }
 
-    buf.insert(buf.begin(),buf.size());
+    buf.insert(buf.begin(),(uint8_t)buf.size());
     buf.insert(buf.begin(),{0x62,0x65,0x67,0x69,0x6E,0x4D,0x73,0x67});
     return buf;
 
@@ -117,21 +116,18 @@ std::vector<int> unpackIntHelper(Buf& buf, int index_look){
     Buf tempBuf(0);
     int tempSize;
     int endIndex;
-    std::cout<<buf[index_look]<<std::endl;
     if(buf[index_look] == 'I'){
         index_look++;
         tempSize = buf[index_look];
-        int endIndex = index_look;
-        for(int i = index_look; i < index_look+tempSize; i++){
+        tempBuf.push_back('I'); tempBuf.push_back(tempSize);
+        endIndex = index_look;
+        for(int i = index_look + 1; i < index_look+1+tempSize; i++){
             tempBuf.push_back(buf[i]);
             endIndex++; 
         }
     }
-    printBuff(tempBuf);
-    std::cout<<std::endl<<tempSize<<std::endl;
-    return {0,0};
+    return {unpackInt(tempBuf), endIndex+1};
 }
-
 std::vector<double> unpackDoubleHelper(Buf& buf, int index_look){
     Buf tempBuf(0);
     int tempSize;
@@ -139,17 +135,23 @@ std::vector<double> unpackDoubleHelper(Buf& buf, int index_look){
     if(buf[index_look] == 'D'){
         index_look++;
         tempSize = buf[index_look];
-        for(int i = index_look; i < index_look + tempSize; i++){
+        tempBuf.push_back('D'); tempBuf.push_back(tempSize);
+        endIndex = index_look;
+        for(int i = index_look+1; i < index_look + 1 + tempSize; i++){
             tempBuf.push_back(buf[i]);
             endIndex++;
         }
     }
-    return{unpackDouble(tempBuf), (double)endIndex};
+    return{unpackDouble(tempBuf), (double)endIndex+1};
 }
 struct PowerLed unpack(Buf& buf){
-    //works for magic bytes that have a size of 8
+    //works for magic bytes that have a size of 8 -- this specific packing function works for a PowerLed struct.
     PowerLed powerled;
     Buf magic_byte(buf.begin(), buf.begin()+8);
+    if(magic_byte != Buf{0x62,0x65,0x67,0x69,0x6E,0x4D,0x73,0x67}){
+        std::cout << "This is not a valid PowerLed message." << std::endl;
+        return powerled;
+    }
     int size = buf[8]; //works for messages with a size < 256
 
     int next_index;
@@ -161,28 +163,10 @@ struct PowerLed unpack(Buf& buf){
     powerled.voltage = temp_double[0]; next_index = temp_double[1];
 
     for(int j = 0; j < 3; j++){
-        powerled.rgb[j+next_index] = unpackIntHelper(buf, next_index)[0];
+        powerled.rgb[j] = unpackIntHelper(buf, next_index)[0];
+        next_index = unpackIntHelper(buf, next_index)[1];
     }
 
     return powerled;
-    /*
-    PowerLed powerled;
 
-    Buf buffy = {buf[0]};
-    int pwr = unpackInt(buffy) > 0 ? 1 : 0; //power deserialization
-    powerled.power = pwr;
-
-    Buf::const_iterator first = buf.begin()+1;
-    Buf::const_iterator last = buf.begin()+5;
-    Buf vltgeBuf(first,last);
-
-    powerled.voltage = unpackDouble(vltgeBuf);
-
-    for(int j = 5;j < 8; j++){
-        Buf intBuf = {buf[j]};
-        powerled.rgb[j-5] = unpackInt(intBuf);
     }
-
-    return powerled;
-    */
-}
