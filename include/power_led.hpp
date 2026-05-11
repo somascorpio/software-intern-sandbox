@@ -26,7 +26,7 @@ Buf packInt(int num){
         num1 = num1 >> 8;
     }
     if(num == 0){buf.push_back(0);}
-    buf.insert(buf.begin(),buf.size());
+    buf.insert(buf.begin(),buf.size());//integers never exceed 255 bytes
     
     buf.insert(buf.begin(),'I');
 
@@ -55,6 +55,29 @@ Buf packDouble(double num,int size){
     return buf;
 }
 
+Buf packIntArray(int nums[], int size){
+    Buf buf;
+    buf.push_back('A');
+    buf.push_back(size);
+    for(int i = 0; i < size ; i++){
+        Buf addee = packInt(nums[i]);
+        buf.insert(buf.end(), addee.begin(), addee.end());
+    }
+    return buf;
+    
+}
+
+Buf packDoubleArray(double nums[], int size, int doubleSize){
+    Buf buf;
+    buf.push_back('A');
+    buf.push_back(size);
+    for(int i = 0; i < size; i++){
+        Buf addee = packDouble(nums[i], doubleSize);
+        buf.insert(buf.end(), addee.begin(), addee.end());
+    }
+    return buf;
+}
+
 int unpackInt(Buf buf){
     int size = buf[1];
     int inty = 0;
@@ -64,9 +87,9 @@ int unpackInt(Buf buf){
 
     return inty;
 }
-double unpackDouble(Buf buf){
+double unpackDouble(const Buf& buf){
     int size = buf[1];
-    int count = 10;
+    //int count = 10;
     int dub1 = 0;
     int n = 2;
     char digit = buf[n];
@@ -84,7 +107,28 @@ double unpackDouble(Buf buf){
 
     return dub2;
 }
+/*
+void unpackIntArray(Buf buf, int* arr){
+    int size = buf[1];
 
+    int nxtIndx = 2;
+    for(int i = 0; i < size; i++){
+        std::vector<int> temp = unpackIntHelper(buf, nxtIndx);
+        nxtIndx = temp[1]; arr[i] = temp[0];
+    }
+}
+
+void unpackDoubleArray(Buf buf, int* arr){
+    int size = buf[1];
+
+    int nxtIndx = 2;
+    int* arr = new int[size];
+    for(int i = 0; i < size; i++){
+        std::vector<double> temp = unpackDoubleHelper(buf, nxtIndx);
+        nxtIndx = temp[1]; //arr
+    }
+}
+*/
 Buf pack(struct PowerLed& msg){
     Buf buf(0);
 
