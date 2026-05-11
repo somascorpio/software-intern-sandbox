@@ -10,6 +10,14 @@ TEST(PowerLedTest, packIntWorksCorrectly){
     EXPECT_EQ(buf[3], 0x03);
 }
 
+TEST(PowerLedTest, negativeIntWorks){
+    int num = -1000;
+    Buf buf = packInt(num);
+    int num2 = unpackInt(buf);
+
+    EXPECT_EQ(num2, 0);
+}
+
 TEST(PowerLedTest, unpackIntWorksCorrectly){
     Buf buf = {'I', 0x02, 0xE8, 0x03};
     int num = unpackInt(buf);
@@ -31,7 +39,7 @@ TEST(PowerLedTest, packDoubleWorksCorrectly){
 TEST(PowerLedTest, unpackDoubleWorksCorrectly){
     Buf buf = {'D',0x05,0x31,0x30,0x2e,0x39,0x39};
     double num = unpackDouble(buf);
-
+    
     EXPECT_TRUE(num-10.99<0.00001);
 }
 
