@@ -14,7 +14,7 @@ TEST(PowerLedTest, packIntWorksCorrectly){
 }
 
 TEST(PowerLedTest, negativeIntDoesNotWork){
-    int num = INT_MIN;
+    int num = -1;
     Buf buf = packInt(num);
     int num2 = unpackInt(buf);
 
