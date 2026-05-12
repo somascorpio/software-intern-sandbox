@@ -71,7 +71,7 @@ Testing serialization with double arrays:
 #### Serialization Information (IMPORTANT)
 
 Data is packed into a byte buffer, which is a vector with a size of 4 of uint8_t types (unsigned 8 bit integer types).
-Byte representation ( bytes total):
+Byte representation (27 bytes total):
 
 
 | data type | byte index(ces) | size (bytes) | notes |
