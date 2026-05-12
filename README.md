@@ -79,7 +79,7 @@ Byte representation (27 bytes total):
 | magic byte | 0-7            | 8            | Denotes the beginning of our message, always stored in 8 bytes as "beginmsg", each character represented in a byte. |
 | integer   | 8-10            | 1            | The inputted integer must be either 0 (stored as ``` {0x49, 0x01, 0x00) ``` or 1 ``` (stored as {0x49, 0x01, 0x01) ```, **representing  power: "on" or "off"**. All inputs >0 will be defaulted to being stored as 1 and inputs <0 will default to 0. All integers are denoted with an 'I' (0x49) and then the length. Bitshifting is used to store integers >255 |
 | double    | 11-16           | 6            | The inputted double must be within **range of 1.60-3.50 to the hundredth's place, representing voltage**. Doubles >9.99 (if storing to the hundredths place, stored as ``` {0x44, 0x04, 0x39, 0x2E, 0x39, 0x39} ```) can still be stored. Each digit is stored as the ASCII alphabet value (ex. 1 will be represented with 0x31), the decimal point will also be stored as 0x2E. Doubles are denoted with a 'D' (0x44) and followed by their length, which includes the decimal point. When packing a double, one can choose the desired length that is stored, all digits past that length are dropped and the double is truncated. |
-| integer array | 16-26       | 11           | The inputted array **represents RGB values for the LED, from 0-255**. The array is denoted as 'A' (0x41) and is followed by the length of the inputted array (in this case, 3) {. It is then followed by packed integers of a length of one byte. The program is able to pack and unpack integers of indeterminable length, but the indeces of our packed PowerLed message will not pertain to those seen on this table. If the data is used for setting RGB values, an error may occur. | 
+| integer array | 16-26       | 11           | The inputted array **represents RGB values for the LED, from 0-255**. The array is denoted as 'A' (0x41) and is followed by the length of the inputted array (in this case, 3) {. It is then followed by packed integers of a length of one byte. The program is able to pack and unpack integers of indeterminable length, but the indices of our packed PowerLed message will not pertain to those seen on this table. If the data is used for setting RGB values, an error may occur. | 
 
 
 *See [examples of bad inputs](#examples-of-bad-inputs)*
@@ -193,7 +193,7 @@ Testing serialization with double arrays:
 #### An example of packing maximum integer and double values:
 
 ```cpp
-#inlclude <climits>
+#include <climits>
 //{...}
 int num = INT_MAX;
 Buf buf = packInt(num);
@@ -299,3 +299,5 @@ Deserialized color:
 ```
 
 *Note: Bad inputs can be disastrous depending on what you're using your project for, please look at the previously linked [Serialization Information](#serialization-information-important) to correctly use our project.*
+
+
