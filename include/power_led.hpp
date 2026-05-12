@@ -42,7 +42,10 @@ Buf packDouble(double num,int size){
         befPoint/=10;
         count--;
     }
-    buf.push_back('.');
+    if(count!=0){
+        buf.push_back('.');
+    }
+    else{return buf;}
     count--;
     double aftPoint = num-(int)num;
     for(int i = 0;i < count; i++){
