@@ -28,5 +28,20 @@ int main(){
     printBuff(test2);
     std::cout << "--> " << std::dec << num2 << std::endl;
 
+    double arrTest1[3] = {1.5,6.7,9.0};
+    Buf test3 = packDoubleArray(arrTest1,3,4);
+    std::cout << "\nTesting serialization with double arrays:\n" << "\t{ | ";
+    for(int i = 0; i < 3; i++){
+        std::cout << arrTest1[i] << " | "; 
+    }
+    std::cout << "}" << " --> ";
+    printBuff(test3);
+    double unpackedArray1[3];
+    unpackDoubleArray(test3, unpackedArray1);
+    std::cout << "--> { | ";
+    for(int j = 0; j < 3; j++){
+        std::cout << unpackedArray1[j] << " | "; 
+    }
+    std::cout << "}" << std::endl;
     return 0;
 }

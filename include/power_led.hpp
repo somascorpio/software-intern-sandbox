@@ -19,7 +19,7 @@ void printBuff(Buf& buf){
 }
 
 Buf packInt(int num){
-    Buf buf{};
+    Buf buf;
     int num1 = num;
     for (int i = 0; i < 8 && num1 > 0;i++){
         buf.push_back((uint8_t)(num1 & 0xFF));
@@ -78,7 +78,7 @@ Buf packDoubleArray(double nums[], int size, int doubleSize){
     return buf;
 }
 
-int unpackInt(Buf buf){
+int unpackInt(Buf& buf){
     int size = buf[1];
     int inty = 0;
     for(int i = 2;i < 2+size; ++i){
@@ -87,9 +87,8 @@ int unpackInt(Buf buf){
 
     return inty;
 }
-double unpackDouble(const Buf& buf){
+double unpackDouble(Buf& buf){
     int size = buf[1];
-    //int count = 10;
     int dub1 = 0;
     int n = 2;
     char digit = buf[n];
@@ -107,28 +106,7 @@ double unpackDouble(const Buf& buf){
 
     return dub2;
 }
-/*
-void unpackIntArray(Buf buf, int* arr){
-    int size = buf[1];
 
-    int nxtIndx = 2;
-    for(int i = 0; i < size; i++){
-        std::vector<int> temp = unpackIntHelper(buf, nxtIndx);
-        nxtIndx = temp[1]; arr[i] = temp[0];
-    }
-}
-
-void unpackDoubleArray(Buf buf, int* arr){
-    int size = buf[1];
-
-    int nxtIndx = 2;
-    int* arr = new int[size];
-    for(int i = 0; i < size; i++){
-        std::vector<double> temp = unpackDoubleHelper(buf, nxtIndx);
-        nxtIndx = temp[1]; //arr
-    }
-}
-*/
 Buf pack(struct PowerLed& msg){
     Buf buf(0);
 
@@ -145,10 +123,10 @@ Buf pack(struct PowerLed& msg){
 
     buf.insert(buf.end(),voltage_bytes_vector.begin(),voltage_bytes_vector.end());
 
-    for(int i = 0; i < 3; i++){
-        Buf tempRGB = packInt(msg.rgb[i] < 256 ? msg.rgb[i] : 255);
-        buf.insert(buf.end(),tempRGB.begin(),tempRGB.end());
-    }
+    Buf rgb_array_vector = packIntArray(msg.rgb, 3);
+
+    buf.insert(buf.end(), rgb_array_vector.begin(), rgb_array_vector.end());
+
 
     buf.insert(buf.begin(),(uint8_t)buf.size());
     buf.insert(buf.begin(),{0x62,0x65,0x67,0x69,0x6E,0x4D,0x73,0x67});
@@ -188,6 +166,73 @@ std::vector<double> unpackDoubleHelper(Buf& buf, int index_look){
     }
     return{unpackDouble(tempBuf), (double)endIndex+1};
 }
+
+void unpackIntArray(Buf& buf, int* arr){
+    int size = buf[1];
+
+    int nxtIndx = 2;
+    for(int i = 0; i < size; i++){
+        std::vector<int> temp = unpackIntHelper(buf, nxtIndx);
+        nxtIndx = temp[1]; arr[i] = temp[0];
+    }
+}
+
+void unpackDoubleArray(Buf& buf, double* arr){
+    int size = buf[1];
+
+    int nxtIndx = 2;
+    for(int i = 0; i < size; i++){
+        std::vector<double> temp = unpackDoubleHelper(buf, nxtIndx);
+        nxtIndx = temp[1]; arr[i] = temp[0];
+    }
+}
+
+int unpackIntArrayHelper(Buf& buf, int* arr, int index_look){
+    Buf tempBuf(0);
+    int tempSize;
+    int iterator;
+    if(buf[index_look] == 'A'){
+        index_look++;
+        tempSize = buf[index_look];
+        tempBuf.push_back('A'); tempBuf.push_back(tempSize);
+        int iterator = index_look+1;
+        for(int i = index_look+1; i < index_look + 1 + tempSize; i++){
+            if(buf[iterator]=='I'){
+                iterator++;
+                for(int j = 0; j < buf[i]; j++){
+                    tempBuf.push_back(buf[i+j]);
+                }
+                iterator+=buf[i+1];
+            }
+        }
+    }
+    unpackIntArray(tempBuf, arr);
+    return iterator;
+    
+}
+
+int unpackDoubleArrayHelper(Buf& buf, double* arr, int index_look){
+Buf tempBuf(0);
+    int tempSize;
+    int iterator;
+    if(buf[index_look] == 'A'){
+        index_look++;
+        tempSize = buf[index_look];
+        tempBuf.push_back('A'); tempBuf.push_back(tempSize);
+        int iterator = index_look+1;
+        for(int i = index_look+1; i < index_look + 1 + tempSize; i++){
+            if(buf[iterator]=='D'){
+                iterator++;
+                for(int j = 0; j < buf[i]; j++){
+                    tempBuf.push_back(buf[i+j]);
+                }
+                iterator+=buf[i+1];
+            }
+        }
+    }
+    unpackDoubleArray(tempBuf, arr);
+    return iterator;
+}
 struct PowerLed unpack(Buf& buf){
     //works for magic bytes that have a size of 8 -- this specific packing function works for a PowerLed struct.
     PowerLed powerled;
@@ -206,10 +251,7 @@ struct PowerLed unpack(Buf& buf){
     std::vector<double> temp_double = unpackDoubleHelper(buf, next_index);
     powerled.voltage = temp_double[0]; next_index = temp_double[1];
 
-    for(int j = 0; j < 3; j++){
-        powerled.rgb[j] = unpackIntHelper(buf, next_index)[0];
-        next_index = unpackIntHelper(buf, next_index)[1];
-    }
+    unpackIntArrayHelper(buf, powerled.rgb, next_index);
 
     return powerled;
 
