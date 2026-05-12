@@ -113,12 +113,12 @@ TEST(PowerLedTests, largeIntegerArray1){
 
 TEST(PowerLedTests, largeIntegerArray2){
     int arr[256];
-    arr[256] = 100;
+    arr[255] = 100;
     Buf buf = packIntArray(arr, 256);
     int unpacked[256];
     unpackIntArray(buf, unpacked);
 
-    EXPECT_NE(unpacked[256], arr[256]); //there is a small chance this could fail.
+    EXPECT_NE(unpacked[255], arr[255]); //there is a small chance this could fail.
     EXPECT_EQ(buf[0], 'A');
     EXPECT_EQ(buf[1], '\0'); //default char value happens because 256 cannot be converted to a 1 byte unsigned integer
 }
@@ -147,12 +147,12 @@ TEST(PowerLedTests, largeDoubleArray1){
 
 TEST(PowerLedTests, largeDoubleArray2){
     double arr[256];
-    arr[256] = 9.99;
+    arr[255] = 9.99;
     Buf buf = packDoubleArray(arr, 256, 4);
     double unpacked[256];
     unpackDoubleArray(buf, unpacked);
 
-    EXPECT_TRUE(unpacked[256]-arr[256]); //there is a small chance this could fail.
+    EXPECT_TRUE(unpacked[255]-arr[255]); //there is a small chance this could fail.
     EXPECT_EQ(buf[0], 'A');
     EXPECT_EQ(buf[1], '\0'); //default char value happens because 256 cannot be converted to a 1 byte unsigned integer
 }
